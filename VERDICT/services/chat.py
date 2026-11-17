@@ -38,7 +38,6 @@ CATEGORY_OPTIONS = [
     "Personal / Family",
 ]
 
-MAX_DOCUMENT_CHARS = 5000
 MAX_HISTORY_MESSAGES = 20  # how many past messages Gemini sees
 
 
@@ -94,18 +93,25 @@ def build_system_prompt():
     return "\n".join(parts)
 
 
-def build_analysis_context(category, both_sides=False, uploaded=None):
+def document_context(document):
+    """Hidden text that gives the model the attached document, if one was read."""
+    if document is None or not document.text:
+        return ""
+    note = " (beginning only, the document was too long)" if document.truncated else ""
+    return f"\n\n[ATTACHED DOCUMENT: {document.name}{note}]\n{document.text}"
+
+
+def build_analysis_context(category, both_sides=False, document=None):
     """Build the hidden context sent with a Case File analysis."""
     context = f"[CATEGORY: {category}]"
     if both_sides:
         context += " [PRESENT BOTH SIDES]"
-    if uploaded is not None:
-        try:
-            doc_text = uploaded.read().decode("utf-8", errors="ignore")[:MAX_DOCUMENT_CHARS]
-            context += f"\n\n[ATTACHED DOCUMENT]\n{doc_text}"
-        except Exception:
-            context += "\n\n[ATTACHED DOCUMENT: could not read]"
-    return context
+    return context + document_context(document)
+
+
+def build_lawyer_prep_context(document=None):
+    """Build the hidden context sent with a Lawyer Prep request."""
+    return "Prepare this client for a lawyer meeting." + document_context(document)
 
 
 # ---------- Replies ----------

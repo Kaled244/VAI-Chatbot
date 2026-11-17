@@ -2,7 +2,7 @@
 
 import streamlit as st
 
-from services import chat
+from services import chat, documents
 
 SUGGESTED_QUESTIONS = [
     ("I was fired without notice.", "I was terminated without notice. What are my rights?", "sq_terminated"),
@@ -129,7 +129,14 @@ def render_case_file():
             key="right_facts",
         )
         st.checkbox("Show both sides' arguments", key="right_both_sides")
-        uploaded = st.file_uploader("Attach document (optional)", label_visibility="collapsed", key="right_upload")
+        uploaded = st.file_uploader(
+            "Attach document (optional)",
+            type=documents.SUPPORTED_TYPES,
+            label_visibility="collapsed",
+            key="right_upload",
+        )
+        document = documents.read_document(uploaded)
+        render_document_status(document)
 
         btn_col1, btn_col2 = st.columns(2)
         with btn_col1:
@@ -141,7 +148,7 @@ def render_case_file():
                     context = chat.build_analysis_context(
                         category=st.session_state.right_category,
                         both_sides=st.session_state.right_both_sides,
-                        uploaded=uploaded,
+                        document=document,
                     )
                     chat.add_user_message(facts, context)
                     st.rerun()
@@ -151,8 +158,28 @@ def render_case_file():
                     st.warning("I cannot prepare a case from silence. Give me the facts.")
                 else:
                     st.session_state.mode = "Lawyer Prep"
-                    chat.add_user_message(facts, "Prepare this client for a lawyer meeting.")
+                    chat.add_user_message(facts, chat.build_lawyer_prep_context(document))
                     st.rerun()
+
+
+def render_document_status(document):
+    """Tell the user whether the attached document was read, with a preview."""
+    if document is None:
+        st.caption("Accepted: PDF, Word (.docx), or .txt")
+        return
+    if document.error:
+        st.warning(f"{document.name}: {document.error}")
+        return
+
+    if document.truncated:
+        st.caption(
+            f"📎 {document.name} — first {len(document.text):,} of "
+            f"{document.total_chars:,} characters will be used."
+        )
+    else:
+        st.caption(f"📎 {document.name} — {document.total_chars:,} characters read.")
+    with st.expander("Preview extracted text"):
+        st.text(document.text[:800] + ("..." if len(document.text) > 800 else ""))
 
 
 def render_citations():
