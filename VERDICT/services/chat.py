@@ -7,7 +7,7 @@ import re
 
 import streamlit as st
 
-from ai.client import DEFAULT_MODEL, generate_reply
+from ai.client import DEFAULT_MODEL, GeminiError, generate_reply
 from ai.prompts.verdict import VERDICT_SYSTEM_PROMPT
 
 MODE_PROMPTS = {
@@ -39,6 +39,7 @@ CATEGORY_OPTIONS = [
 ]
 
 MAX_DOCUMENT_CHARS = 5000
+MAX_HISTORY_MESSAGES = 20  # how many past messages Gemini sees
 
 
 # ---------- Session state ----------
@@ -48,7 +49,6 @@ def init_session_state():
     defaults = {
         "messages": [],
         "mode": "Legal Chat",
-        "category": "Labor / Civil / Criminal",
         "last_references": [],
         "model_name": DEFAULT_MODEL,
     }
@@ -58,10 +58,15 @@ def init_session_state():
 
 
 def add_user_message(content, context=""):
-    """Add a user message to the history, with optional hidden context for the model."""
-    st.session_state.messages.append({"role": "user", "content": content})
+    """Add a user message to the history, with optional hidden context for the model.
+
+    The context (category, attached document) is stored with the message so
+    Gemini still sees it in later follow-up questions. It is never displayed.
+    """
+    message = {"role": "user", "content": content}
     if context:
-        st.session_state.pending_context = context
+        message["context"] = context
+    st.session_state.messages.append(message)
 
 
 def clear_conversation():
@@ -111,17 +116,29 @@ def needs_reply():
     return bool(messages) and messages[-1]["role"] == "user"
 
 
-def answer_last_message():
-    """Ask Gemini to answer the latest user message and store the reply."""
-    last_user_msg = st.session_state.messages[-1]["content"]
-    context = st.session_state.pop("pending_context", "")
+def conversation_history():
+    """The recent messages Gemini should see: no error notices, starting with a user turn."""
+    history = [m for m in st.session_state.messages if not m.get("error")]
+    history = history[-MAX_HISTORY_MESSAGES:]
+    while history and history[0]["role"] != "user":
+        history.pop(0)
+    return history
 
-    reply = generate_reply(
-        prompt=last_user_msg,
-        system_instruction=build_system_prompt(),
-        model=st.session_state.model_name,
-        extra_context=context,
-    )
+
+def answer_last_message():
+    """Ask Gemini to answer the latest user message, using the conversation so far."""
+    try:
+        reply = generate_reply(
+            messages=conversation_history(),
+            system_instruction=build_system_prompt(),
+            model=st.session_state.model_name,
+        )
+    except GeminiError as error:
+        # Shown in the chat, but flagged so it is never sent back to Gemini as history.
+        st.session_state.messages.append(
+            {"role": "assistant", "content": f"⚠️ {error}", "error": True}
+        )
+        return
 
     st.session_state.messages.append({"role": "assistant", "content": reply})
     st.session_state.last_references = extract_references(reply)
