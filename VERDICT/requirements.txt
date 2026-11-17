@@ -2,3 +2,5 @@
 google-genai
 python-dotenv
 cryptography<43
+pypdf
+python-docx
