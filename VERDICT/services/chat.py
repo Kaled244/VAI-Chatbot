@@ -3,12 +3,11 @@
 Nothing in this file draws UI. The ui/ folder calls these functions.
 """
 
-import re
-
 import streamlit as st
 
 from ai.client import DEFAULT_MODEL, GeminiError, stream_reply
 from ai.prompts.verdict import VERDICT_SYSTEM_PROMPT
+from services.citations import extract_citations
 
 MODE_PROMPTS = {
     "Legal Chat":        "Respond conversationally to the user's legal question.",
@@ -143,7 +142,7 @@ def reply_stream():
 def save_reply(reply):
     """Store a finished answer and update the citations."""
     st.session_state.messages.append({"role": "assistant", "content": reply})
-    st.session_state.last_references = extract_references(reply)
+    st.session_state.last_references = extract_citations(reply)
 
 
 def save_error(error):
@@ -151,18 +150,3 @@ def save_error(error):
     st.session_state.messages.append(
         {"role": "assistant", "content": f"⚠️ {error}", "error": True}
     )
-
-
-def extract_references(reply_text):
-    """Naive extraction of statute/case mentions to populate the Citations card."""
-    refs = []
-    for m in re.findall(r"G\.R\.\s*No\.\s*[\d\-]+", reply_text):
-        refs.append(("CASE", m))
-    for m in re.findall(r"(Republic Act No\.\s*\d+|Article \d+[A-Z]?)", reply_text):
-        refs.append(("LAW", m))
-    seen, unique = set(), []
-    for kind, val in refs:
-        if val not in seen:
-            seen.add(val)
-            unique.append((kind, val))
-    return unique[:5]

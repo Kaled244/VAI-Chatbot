@@ -2,7 +2,7 @@
 
 import streamlit as st
 
-from services import chat, documents
+from services import chat, documents, export
 
 SUGGESTED_QUESTIONS = [
     ("I was fired without notice.", "I was terminated without notice. What are my rights?", "sq_terminated"),
@@ -213,14 +213,47 @@ def render_document_status(document):
 
 
 def render_citations():
-    """Citations found in the latest reply."""
+    """Citations found in the latest reply, each linked to a search on Lawphil."""
     with st.container(border=True):
         st.markdown("<div class='nav-label'>Citations</div>", unsafe_allow_html=True)
-        if st.session_state.last_references:
-            for kind, val in st.session_state.last_references:
-                icon = "⚖️" if kind == "CASE" else "📜"
-                st.markdown(f"{icon} **{kind}**")
-                st.caption(val)
-                st.markdown("<hr/>", unsafe_allow_html=True)
-        else:
+        citations = st.session_state.last_references
+        if not citations:
             st.caption("Citations from the latest exchange will appear here.")
+            return
+        for citation in citations:
+            icon = "⚖️" if citation["kind"] == "CASE" else "📜"
+            st.markdown(f"{icon} **{citation['kind']}**  \n[{citation['label']}]({citation['url']})")
+            st.markdown("<hr/>", unsafe_allow_html=True)
+        st.caption("Links open a search on Lawphil. Always check the full text.")
+
+
+def render_export():
+    """Download buttons for the conversation, as Word or plain text."""
+    with st.container(border=True):
+        st.markdown("<div class='nav-label'>Export the Record</div>", unsafe_allow_html=True)
+        messages = export.exportable_messages(st.session_state.messages)
+        if not messages:
+            st.caption("Your conversation can be downloaded once it starts.")
+            return
+
+        args = (st.session_state.messages, st.session_state.mode, st.session_state.last_references)
+        col_word, col_text = st.columns(2)
+        with col_word:
+            st.download_button(
+                "Word (.docx)",
+                data=export.build_docx(*args),
+                file_name=export.file_name("docx"),
+                mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                use_container_width=True,
+                key="export_docx",
+            )
+        with col_text:
+            st.download_button(
+                "Text (.txt)",
+                data=export.build_text(*args),
+                file_name=export.file_name("txt"),
+                mime="text/plain",
+                use_container_width=True,
+                key="export_txt",
+            )
+        st.caption("Bring this to your lawyer, especially after Lawyer Prep.")

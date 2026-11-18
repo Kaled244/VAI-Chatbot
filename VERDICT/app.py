@@ -41,6 +41,7 @@ with col_mid:
 with col_right:
     components.render_case_file()
     components.render_citations()
+    components.render_export()
 
 # Stream a reply when the last message is from the user,
 # then rerun so the history shows it.
