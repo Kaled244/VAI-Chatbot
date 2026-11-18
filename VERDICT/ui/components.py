@@ -17,13 +17,16 @@ SUGGESTED_QUESTIONS = [
 
 def render_header():
     """Logo, title, Clear and Settings buttons, and the settings panel."""
-    col_logo, col_title, col_btn1, col_btn2 = st.columns([0.6, 5, 1.3, 1.1])
-    with col_logo:
-        st.markdown("<div style='font-size:2.6rem; line-height:1;'>⚖️</div>", unsafe_allow_html=True)
+    col_title, col_btn1, col_btn2 = st.columns([5.5, 1.3, 1.1])
     with col_title:
         st.markdown(
+            "<div class='verdict-brand'>"
+            "<div class='verdict-logo'>⚖️</div>"
+            "<div>"
             "<div class='verdict-title'>VERDICT</div>"
-            "<div class='verdict-subtitle'>\"I keep my eyes open.\"</div>",
+            "<div class='verdict-subtitle'>\"I keep my eyes open.\"</div>"
+            "</div>"
+            "</div>",
             unsafe_allow_html=True,
         )
     with col_btn1:
