@@ -84,7 +84,10 @@ def render_navigation():
 # ---------- Middle column ----------
 
 def render_chat():
-    """Suggested questions, the message history, and the chat input."""
+    """Suggested questions, the message history, and the chat input.
+
+    Returns the history container so a new reply can be streamed into it.
+    """
     with st.container(border=True):
         st.markdown("<div class='section-label'>Counsel suggests</div>", unsafe_allow_html=True)
         columns = st.columns(len(SUGGESTED_QUESTIONS))
@@ -94,7 +97,8 @@ def render_chat():
                     chat.add_user_message(question)
                     st.rerun()
 
-    with st.container(height=520, border=True):
+    history = st.container(height=520, border=True)
+    with history:
         if not st.session_state.messages:
             st.markdown(
                 "<div style='text-align:center; padding:2rem 0; color:#6E6A63;'>"
@@ -113,6 +117,32 @@ def render_chat():
     if prompt := st.chat_input("State the facts. Leave nothing out."):
         chat.add_user_message(prompt)
         st.rerun()
+
+    return history
+
+
+def _hide_when_started(stream, status):
+    """Pass the stream through, clearing the status line once text arrives."""
+    started = False
+    for piece in stream:
+        if not started:
+            status.empty()
+            started = True
+        yield piece
+
+
+def render_streaming_reply(history):
+    """Show Gemini's answer word by word inside the chat history, then save it."""
+    with history:
+        with st.chat_message("assistant", avatar="🔨"):
+            status = st.empty()
+            status.caption("Reviewing the facts...")
+            try:
+                reply = st.write_stream(_hide_when_started(chat.reply_stream(), status))
+            except chat.GeminiError as error:
+                chat.save_error(error)
+                return
+    chat.save_reply(reply)
 
 
 # ---------- Right column ----------

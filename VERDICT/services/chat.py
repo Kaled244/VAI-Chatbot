@@ -7,7 +7,7 @@ import re
 
 import streamlit as st
 
-from ai.client import DEFAULT_MODEL, GeminiError, generate_reply
+from ai.client import DEFAULT_MODEL, GeminiError, stream_reply
 from ai.prompts.verdict import VERDICT_SYSTEM_PROMPT
 
 MODE_PROMPTS = {
@@ -131,23 +131,26 @@ def conversation_history():
     return history
 
 
-def answer_last_message():
-    """Ask Gemini to answer the latest user message, using the conversation so far."""
-    try:
-        reply = generate_reply(
-            messages=conversation_history(),
-            system_instruction=build_system_prompt(),
-            model=st.session_state.model_name,
-        )
-    except GeminiError as error:
-        # Shown in the chat, but flagged so it is never sent back to Gemini as history.
-        st.session_state.messages.append(
-            {"role": "assistant", "content": f"⚠️ {error}", "error": True}
-        )
-        return
+def reply_stream():
+    """Gemini's answer to the latest user message, as a stream of text pieces."""
+    return stream_reply(
+        messages=conversation_history(),
+        system_instruction=build_system_prompt(),
+        model=st.session_state.model_name,
+    )
 
+
+def save_reply(reply):
+    """Store a finished answer and update the citations."""
     st.session_state.messages.append({"role": "assistant", "content": reply})
     st.session_state.last_references = extract_references(reply)
+
+
+def save_error(error):
+    """Store an error notice. It is shown in the chat but never sent back to Gemini."""
+    st.session_state.messages.append(
+        {"role": "assistant", "content": f"⚠️ {error}", "error": True}
+    )
 
 
 def extract_references(reply_text):

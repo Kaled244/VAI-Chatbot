@@ -36,16 +36,14 @@ with col_left:
     components.render_navigation()
 
 with col_mid:
-    components.render_chat()
+    chat_history = components.render_chat()
 
 with col_right:
     components.render_case_file()
     components.render_citations()
 
-# Generate a reply when the last message is from the user,
+# Stream a reply when the last message is from the user,
 # then rerun so the history shows it.
 if chat.needs_reply():
-    with col_mid:
-        with st.spinner("Reviewing the facts..."):
-            chat.answer_last_message()
+    components.render_streaming_reply(chat_history)
     st.rerun()
