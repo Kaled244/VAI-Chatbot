@@ -1,5 +1,7 @@
 """UI pieces for VERDICT. Each function draws one part of the page."""
 
+import html
+
 import streamlit as st
 
 from services import chat, documents, export
@@ -15,7 +17,7 @@ SUGGESTED_QUESTIONS = [
 
 def render_header():
     """Logo, title, Clear and Settings buttons, and the settings panel."""
-    col_logo, col_title, col_btn1, col_btn2 = st.columns([0.6, 5, 1, 1])
+    col_logo, col_title, col_btn1, col_btn2 = st.columns([0.6, 5, 1.3, 1.1])
     with col_logo:
         st.markdown("<div style='font-size:2.6rem; line-height:1;'>⚖️</div>", unsafe_allow_html=True)
     with col_title:
@@ -83,12 +85,26 @@ def render_navigation():
 
 # ---------- Middle column ----------
 
+def render_mode_banner():
+    """Shows which mode is active and what it does."""
+    mode = st.session_state.mode
+    st.markdown(
+        "<div class='mode-banner'>"
+        "<span class='mode-tag'>Now in</span>"
+        f"<span class='mode-name'>{html.escape(chat.MODE_LABELS.get(mode, mode))}</span>"
+        f"<span class='mode-desc'>{html.escape(chat.MODE_DESCRIPTIONS.get(mode, ''))}</span>"
+        "</div>",
+        unsafe_allow_html=True,
+    )
+
+
 def render_chat():
     """Suggested questions, the message history, and the chat input.
 
     Returns the history container so a new reply can be streamed into it.
     """
     with st.container(border=True):
+        render_mode_banner()
         st.markdown("<div class='section-label'>Counsel suggests</div>", unsafe_allow_html=True)
         columns = st.columns(len(SUGGESTED_QUESTIONS))
         for column, (label, question, key) in zip(columns, SUGGESTED_QUESTIONS):
@@ -195,8 +211,7 @@ def render_case_file():
 def render_document_status(document):
     """Tell the user whether the attached document was read, with a preview."""
     if document is None:
-        st.caption("Accepted: PDF, Word (.docx), or .txt")
-        return
+        return  # the uploader already lists the accepted file types
     if document.error:
         st.warning(f"{document.name}: {document.error}")
         return
@@ -220,10 +235,18 @@ def render_citations():
         if not citations:
             st.caption("Citations from the latest exchange will appear here.")
             return
+
+        rows = []
         for citation in citations:
-            icon = "⚖️" if citation["kind"] == "CASE" else "📜"
-            st.markdown(f"{icon} **{citation['kind']}**  \n[{citation['label']}]({citation['url']})")
-            st.markdown("<hr/>", unsafe_allow_html=True)
+            kind = citation["kind"]
+            rows.append(
+                "<div class='cite'>"
+                f"<span class='cite-kind {kind.lower()}'>{html.escape(kind)}</span>"
+                f"<a href='{html.escape(citation['url'])}' target='_blank' rel='noopener'>"
+                f"{html.escape(citation['label'])}</a>"
+                "</div>"
+            )
+        st.markdown(f"<div class='cite-list'>{''.join(rows)}</div>", unsafe_allow_html=True)
         st.caption("Links open a search on Lawphil. Always check the full text.")
 
 

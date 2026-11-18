@@ -29,6 +29,17 @@ MODE_LABELS = {
     "Lawyer Prep":       "Prepare for Court",
 }
 
+# Short explanations shown to the user for the active mode.
+MODE_DESCRIPTIONS = {
+    "Legal Chat":        "Ask any legal question in plain words.",
+    "Situation Analysis":"A step-by-step look at your facts, the laws involved, and likely outcomes.",
+    "Law Search":        "Finds the statutes and Supreme Court cases that apply.",
+    "Know Your Rights":  "Your rights, and the law that grants each one.",
+    "Document Guide":    "Which document or form you need, and where to file it.",
+    "Debate Analysis":   "The arguments on both sides, then a balanced conclusion.",
+    "Lawyer Prep":       "A summary of your case and the questions to ask your lawyer.",
+}
+
 CATEGORY_OPTIONS = [
     "Labor / Civil / Criminal",
     "Civil / Housing",

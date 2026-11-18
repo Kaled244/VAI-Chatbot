@@ -30,7 +30,7 @@ chat.init_session_state()
 
 components.render_header()
 
-col_left, col_mid, col_right = st.columns([1.4, 4, 2.4], gap="large")
+col_left, col_mid, col_right = st.columns([1.6, 4, 2.4], gap="large")
 
 with col_left:
     components.render_navigation()
