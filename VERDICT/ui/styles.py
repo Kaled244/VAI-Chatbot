@@ -20,6 +20,13 @@ THEME_CSS = """
         font-family: 'Playfair Display', serif; font-size: 2.6rem; font-weight: 700;
         color: var(--navy); margin: 0; line-height: 1.1; letter-spacing: 1px;
     }
+
+    .verdict-brand { display: flex; align-items: center; gap: 12px; }
+    .verdict-logo { font-size: 2.6rem; line-height: 1; }
+
+    /* Push the header buttons down to line up with the title. */
+    .st-key-header_clear, .st-key-header_settings { margin-top: 18px; }
+
     .verdict-subtitle {
         font-family: 'Inter', sans-serif; font-size: 1rem; color: var(--muted);
         margin-top: 4px; letter-spacing: 2px; text-transform: uppercase;
@@ -108,6 +115,16 @@ THEME_CSS = """
         display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px;
         padding: 2px 0 10px 0; margin-bottom: 6px; border-bottom: 1px solid #F0EBDD;
     }
+
+    /* Category dropdown: hide the typing cursor so it looks like a plain menu. */
+    div[data-baseweb="select"] input,
+    div[data-baseweb="select"] [role="combobox"],
+    [data-testid="stSelectbox"] input {
+        caret-color: transparent !important;
+        cursor: pointer !important;
+        user-select: none !important;
+    }
+
     .mode-tag {
         font-family: 'Inter', sans-serif; font-size: 0.7rem; letter-spacing: 1.5px;
         text-transform: uppercase; color: var(--muted); font-weight: 600;
