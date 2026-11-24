@@ -1,0 +1,65 @@
+[
+  {
+    "title": "1987 Constitution — Bill of Rights",
+    "category": "Constitutional law",
+    "jurisdiction": "Philippines",
+    "text": "Article III, Section 1 protects life, liberty, and property through due process and guarantees equal protection. Section 2 protects persons, houses, papers, and effects against unreasonable searches and seizures and requires probable cause and particularity in warrants. Section 12 gives an accused or a person under investigation the rights to remain silent and to competent and independent counsel. Section 14 provides the right to be presumed innocent and to due process in criminal cases. Section 17 protects against compelled self-incrimination. Section 18 protects against detention solely for political beliefs.",
+    "source_url": "https://lawphil.net/consti/cons1987.html"
+  },
+  {
+    "title": "1987 Constitution — Labor",
+    "category": "Labor / employment",
+    "jurisdiction": "Philippines",
+    "text": "Article XIII, Section 3 requires full protection to labor and recognizes the rights of workers to self-organization, collective bargaining and negotiations, peaceful concerted activities, security of tenure, humane conditions of work, and a living wage. The Constitution directs the State to favor voluntary modes of settling labor disputes and to regulate labor-management relations.",
+    "source_url": "https://lawphil.net/consti/cons1987.html"
+  },
+  {
+    "title": "Labor Code of the Philippines — Articles 294 and 295",
+    "category": "Labor / employment",
+    "jurisdiction": "Philippines",
+    "text": "The Labor Code's security-of-tenure rule generally prohibits termination without a just or authorized cause and without procedural due process. Just causes include serious misconduct, willful disobedience, gross and habitual neglect, fraud or breach of trust, commission of a crime, and analogous causes. Authorized causes include installation of labor-saving devices, redundancy, retrenchment to prevent losses, closure or cessation of operations, and disease. The applicable notice, separation-pay, and procedural requirements depend on the cause.",
+    "source_url": "https://lawphil.net/statutes/presdecs/pd442.html"
+  },
+  {
+    "title": "Labor Code of the Philippines — Wage and Working Conditions",
+    "category": "Labor / employment",
+    "jurisdiction": "Philippines",
+    "text": "Philippine labor standards cover minimum wages fixed by regional boards, rest days, overtime pay, night-shift differential, service incentive leave, holiday pay, and other benefits. Applicable rates vary by region and employment arrangement. Wage orders and statutory amendments can change the governing figures, so answers must identify the effective period and official regional wage order.",
+    "source_url": "https://lawphil.net/statutes/presdecs/pd442.html"
+  },
+  {
+    "title": "Civil Code of the Philippines — Obligations and Contracts",
+    "category": "Civil / housing",
+    "jurisdiction": "Philippines",
+    "text": "The Civil Code defines obligations and contracts as matters of civil law. An obligation is a juridical necessity to give, to do, or not to do. Contracts bind the parties according to their terms and can produce default liability, damages, cancellation, rescission, or specific performance as provided by law and the contract. Lease and deposit questions depend on the contract, the Civil Code, and applicable local or special rules.",
+    "source_url": "https://lawphil.net/statutes/repacts/ra386.html"
+  },
+  {
+    "title": "Revised Penal Code — General Criminal Law",
+    "category": "Criminal law",
+    "jurisdiction": "Philippines",
+    "text": "The Revised Penal Code defines and punishes common felonies and sets general principles for criminal liability, penalties, and defenses. Specific elements and penalties vary by offense and may be modified or superseded by special penal laws. Arrest and detention remain subject to constitutional rights and the Rules of Criminal Procedure.",
+    "source_url": "https://lawphil.net/statutes/acts/act3815.html"
+  },
+  {
+    "title": "Republic Act No. 9262 — Anti-Violence Against Women and Their Children Act",
+    "category": "Personal / family",
+    "jurisdiction": "Philippines",
+    "text": "Republic Act 9262 protects women and their children from physical, sexual, psychological, economic, and threatening violence by a person in a dating or intimate relationship or a person sharing a child with the victim. Available remedies may include protection orders, criminal liability, support, custody-related relief, and restitution, subject to the court's jurisdiction and findings. Protection orders include barangay protection orders, temporary protection orders, and permanent protection orders.",
+    "source_url": "https://lawphil.net/statutes/repacts/ra9262.html"
+  },
+  {
+    "title": "Family Code of the Philippines",
+    "category": "Personal / family",
+    "jurisdiction": "Philippines",
+    "text": "The Family Code governs marriage, legal separation, annulment, nullity, parentage, legitimacy, custody, support, parental authority, property relations, and succession-related family matters. The substantive and procedural requirements for ending or contesting a marriage depend on the particular ground and are subject to court process. Family disputes should be distinguished from general civil contract disputes.",
+    "source_url": "https://lawphil.net/statutes/executive/execord/eorder209.html"
+  },
+  {
+    "title": "Rules on Humanitarian Evictions — Rent and Housing General Guidance",
+    "category": "Civil / housing",
+    "jurisdiction": "Philippines",
+    "text": "Housing disputes can involve the Civil Code, the Rent Control Act where applicable, local rules, and court ejectment procedure. A tenant's or occupant's rights depend on the lease, payment history, authority to occupy, and the specific ground for eviction. Actual eviction and demolitions require lawful process and, for protected settlements, humane standards.",
+    "source_url": "https://lawphil.net/"
+  }
+]

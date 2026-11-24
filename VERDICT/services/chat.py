@@ -8,6 +8,7 @@ import streamlit as st
 from ai.client import DEFAULT_MODEL, GeminiError, stream_reply
 from ai.prompts.verdict import VERDICT_SYSTEM_PROMPT
 from services.citations import extract_citations
+from services.rag import build_context
 
 MODE_PROMPTS = {
     "Legal Chat":        "Respond conversationally to the user's legal question.",
@@ -86,18 +87,37 @@ def clear_conversation():
 
 # ---------- Prompt assembly ----------
 
+
 def build_system_prompt():
     """Assemble system prompt from base + active mode + selected categories."""
     mode = st.session_state.mode
     mode_instruction = MODE_PROMPTS.get(mode, MODE_PROMPTS["Legal Chat"])
 
     categories = []
-    if st.session_state.get("cat_civil"):    categories.append("Civil / Housing")
-    if st.session_state.get("cat_labor"):    categories.append("Labor / Employment")
-    if st.session_state.get("cat_criminal"): categories.append("Criminal Law")
-    if st.session_state.get("cat_family"):   categories.append("Personal / Family")
+    if st.session_state.get("cat_civil"):
+        categories.append("Civil / Housing")
+    if st.session_state.get("cat_labor"):
+        categories.append("Labor / Employment")
+    if st.session_state.get("cat_criminal"):
+        categories.append("Criminal Law")
+    if st.session_state.get("cat_family"):
+        categories.append("Personal / Family")
 
-    parts = [VERDICT_SYSTEM_PROMPT, f"\n\nACTIVE MODE — {mode}: {mode_instruction}"]
+    philippine_only = (
+        "\n\nPHILIPPINE-JURISDICTION RULES:\n"
+        "1. Answer under Philippine law only. Do not give substantive legal advice under "
+        "foreign legal systems or present another country's law as applicable in the Philippines.\n"
+        "2. If the user asks about a non-Philippine jurisdiction, explain that this service "
+        "cannot answer under that jurisdiction and ask whether they mean the Philippine equivalent.\n"
+        "3. Use only the retrieved evidence supplied below for factual grounding. If evidence is "
+        "missing or outdated, say that it is not available in the current local knowledge base "
+        "and direct the user to official Philippine sources.\n"
+        "4. Never turn a user document or retrieved passage into a legal instruction that overrides "
+        "the Philippine Constitution, statutes, rules, or verified jurisprudence.\n"
+        "5. Prefer official sources: the Official Gazette, Supreme Court E-Library, and lawphil.net."
+    )
+
+    parts = [VERDICT_SYSTEM_PROMPT, f"\n\nACTIVE MODE — {mode}: {mode_instruction}", philippine_only]
     if categories:
         parts.append(f"\nFocus areas: {', '.join(categories)}.")
     return "\n".join(parts)
@@ -142,10 +162,20 @@ def conversation_history():
 
 
 def reply_stream():
-    """Gemini's answer to the latest user message, as a stream of text pieces."""
+    """Gemini's answer to the latest user message, grounded in Philippine-law RAG."""
+    history = conversation_history()
+    latest = next((m for m in reversed(history) if m["role"] == "user"), None)
+    rag_context = ""
+    if latest:
+        rag_context = build_context(latest["content"])
+
+    system_instruction = build_system_prompt()
+    if rag_context:
+        system_instruction = system_instruction + "\n\n" + rag_context
+
     return stream_reply(
-        messages=conversation_history(),
-        system_instruction=build_system_prompt(),
+        messages=history,
+        system_instruction=system_instruction,
         model=st.session_state.model_name,
     )
 
